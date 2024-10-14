@@ -1,0 +1,10 @@
+_target: src.data.diff_datamodule.DIFF_DataModule
+batch_size: 32
+data_choice: mnist
+pad: 2
+train_val_test_split:
+- 60000
+- 10000
+- 0
+num_workers: 0
+pin_memory: false
