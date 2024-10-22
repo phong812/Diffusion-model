@@ -31,6 +31,6 @@ python src/train.py
 ```
 
 ## Generated Images
-# FashionMNIST
+### FashionMNIST
 ![image](https://github.com/user-attachments/assets/cc200323-1860-4428-a0ae-92870dd79c00)
 
