@@ -1,5 +1,3 @@
-______________________________________________________________________
-
 <div align="center">
 
 # DDPM
@@ -15,41 +13,10 @@ ______________________________________________________________________
 
 ## Description
 
-What it does
+In this repository, I implemented two basic diffusion models (DDPM & DDIM). Both models were trained on the MNIST, FashionMNIST, and CIFAR10 datasets. The code for this implementation was referenced from [here](https://github.com/awjuliani/pytorch-diffusion/tree/master).
 
-## Installation
+Supports MNIST, Fashion-MNIST and CIFAR datasets.
 
-#### Pip
-
-```bash
-# clone project
-git clone https://github.com/YourGithubName/your-repo-name
-cd your-repo-name
-
-# [OPTIONAL] create conda environment
-conda create -n myenv python=3.9
-conda activate myenv
-
-# install pytorch according to instructions
-# https://pytorch.org/get-started/
-
-# install requirements
-pip install -r requirements.txt
-```
-
-#### Conda
-
-```bash
-# clone project
-git clone https://github.com/YourGithubName/your-repo-name
-cd your-repo-name
-
-# create conda environment and install dependencies
-conda env create -f environment.yaml -n myenv
-
-# activate conda environment
-conda activate myenv
-```
 
 ## How to run
 
@@ -59,18 +26,11 @@ Train model with default configuration
 # train on CPU
 python src/train.py trainer=cpu
 
-# train on GPU
-python src/train.py trainer=gpu
+# train on GPU (default)
+python src/train.py
 ```
 
-Train model with chosen experiment configuration from [configs/experiment/](configs/experiment/)
+## Generated Images
+# FashionMNIST
+![image](https://github.com/user-attachments/assets/cc200323-1860-4428-a0ae-92870dd79c00)
 
-```bash
-python src/train.py experiment=experiment_name.yaml
-```
-
-You can override any parameter from command line like this
-
-```bash
-python src/train.py trainer.max_epochs=20 data.batch_size=64
-```
