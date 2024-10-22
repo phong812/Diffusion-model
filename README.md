@@ -32,5 +32,5 @@ python src/train.py
 
 ## Generated Images
 ### FashionMNIST
-![image](https://github.com/user-attachments/assets/cc200323-1860-4428-a0ae-92870dd79c00)
+[![image](https://github.com/user-attachments/assets/cc200323-1860-4428-a0ae-92870dd79c00)](https://github.com/phong812/Diffusion-model/blob/6dd0731236e1aea71919f13f386aeddab0b2bc0d/pred.gif)
 
