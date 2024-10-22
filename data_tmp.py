@@ -11,10 +11,9 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import rootutils
 
-
 path = rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 
-from src.data.components.diff_dataset import DiffusionDataset
+from src.data.components.diffusion_dataset import DiffusionDataset
 
 
 class DIFF_DataModule(LightningDataModule):
@@ -50,11 +49,11 @@ class DIFF_DataModule(LightningDataModule):
 
         # load and split datasets only if not loaded already
         if not self.data_train and not self.data_val and not self.data_test:
-            trainset = DiffusionDataset(self.hparams.data_dir, train=True, transform=self.transforms)
-            testset = DiffusionDataset(self.hparams.data_dir, train=False, transform=self.transforms)
+            trainset = DiffusionDataset(train=True, dataset_name=self.hparams.dataset_name)
+            testset = DiffusionDataset(train=False, dataset_name=self.hparams.dataset_name)
             dataset = ConcatDataset(datasets=[trainset, testset])
             
-            self.data_train, self.data_val, _ = random_split(
+            self.data_train, self.data_val, self.data_test = random_split(
                 dataset=dataset,
                 lengths=self.hparams.train_val_test_split,
                 generator=torch.Generator().manual_seed(42),

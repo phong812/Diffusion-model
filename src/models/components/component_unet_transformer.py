@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-############################################################### MODULES ###############################################################
+
 class SelfAttention(nn.Module):
     def __init__(self, h_size):
         super(SelfAttention, self).__init__()
@@ -88,7 +88,7 @@ class Up(nn.Module):
             self.up = nn.ConvTranspose2d(
                 in_channels, in_channels // 2, kernel_size=2, stride=2
             )
-            self.conv = DoubleConv(in_channels, out_channels)
+        self.conv = DoubleConv(in_channels, out_channels)
 
     def forward(self, x1, x2):
         x1 = self.up(x1)
@@ -110,72 +110,3 @@ class OutConv(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
-    
-############################################################### MODEL ###############################################################
-
-class AttentionUNet(nn.Module):
-    def __init__(self, img_depth, accelerator):
-        super().__init__()
-        
-        self.device = ('cuda' if torch.cuda.is_available() else 'cpu')
-        
-        bilinear = True
-        self.inc = DoubleConv(img_depth, 64).to(self.device)
-        self.down1 = Down(64, 128).to(self.device)
-        self.down2 = Down(128, 256).to(self.device)
-        factor = 2 if bilinear else 1
-        self.down3 = Down(256, 512 // factor).to(self.device)
-        self.up1 = Up(512, 256 // factor, bilinear).to(self.device)
-        self.up2 = Up(256, 128 // factor, bilinear).to(self.device)
-        self.up3 = Up(128, 64, bilinear).to(self.device)
-        self.outc = OutConv(64, img_depth).to(self.device)
-        self.sa1 = SAWrapper(256, 8).to(self.device)
-        self.sa2 = SAWrapper(256, 4).to(self.device)
-        self.sa3 = SAWrapper(128, 8).to(self.device)
-        
-        if accelerator == "gpu":
-            self.device = torch.device('cuda')
-        else:
-            self.device = torch.device('cpu')
-        
-        
-        # self.device = "cpu"
-    
-    def pos_encoding(self, t, channels, embed_size):
-        t = t.to(self.device)
-        inv_freq = 1.0 / (
-            10000
-            ** (torch.arange(0, channels, 2, device=self.device).float() / channels)
-        )
-        pos_enc_a = torch.sin(t.repeat(1, channels // 2) * inv_freq)
-        pos_enc_b = torch.cos(t.repeat(1, channels // 2) * inv_freq)
-        pos_enc = torch.cat([pos_enc_a, pos_enc_b], dim=-1)
-        return pos_enc.view(-1, channels, 1, 1).repeat(1, 1, embed_size, embed_size)
-
-    def forward(self, x, t):
-        """
-        Model is U-Net with added positional encodings and self-attention layers.
-        """
-        x, t = x.to(self.device), t.to(self.device)
-        x1 = self.inc(x)
-        x2 = self.down1(x1) + self.pos_encoding(t, 128, 16)
-        x3 = self.down2(x2) + self.pos_encoding(t, 256, 8)
-        x3 = self.sa1(x3)
-        x4 = self.down3(x3) + self.pos_encoding(t, 256, 4)
-        x4 = self.sa2(x4)
-        x = self.up1(x4, x3) + self.pos_encoding(t, 128, 8)
-        x = self.sa3(x)
-        x = self.up2(x, x2) + self.pos_encoding(t, 64, 16)
-        x = self.up3(x, x1) + self.pos_encoding(t, 64, 32)
-        output = self.outc(x)
-        return output
-    
-    
-if __name__ == "__main__":
-    model = AttentionUNet(img_depth=1, accelerator="gpu")
-    device = model.device
-    print(f"Device: {device}")
-    input = (2*torch.rand((32,1,32,32)) - 1).to(device) # Example input tensor on GPU
-    t = torch.randint(0, 1000, size=(32, 1)).to(device) # Example time tensor on GPU
-    output = model(input, t)
-    print(output.shape)

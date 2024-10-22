@@ -4,7 +4,7 @@ from torchvision import transforms
 import torch
 
 class DiffusionDataset(Dataset):
-  def __init__(self, train=True, dataset_name="MNIST"):
+  def __init__(self, train=True, dataset_name="FashionMNIST"):
     datasets = {
         "MNIST": MNIST,
         "FashionMNIST": FashionMNIST,
